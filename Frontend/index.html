@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EAMCET College Predictor</title>
+  <link rel="icon" href="green.png" type="image/x-icon">
+
+  <!-- AOS CSS -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --accent: #4895ef;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+      --info: #560bad;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7ff;
+      color: var(--dark);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==');
+      opacity: 0.4;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      position: relative;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .header p {
+      font-size: 1rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .main-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .predictor-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      background-color: white;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+      outline: none;
+    }
+
+    .btn {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      padding: 0.875rem 2rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      text-align: center;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .btn:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(67, 97, 238, 0.2);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .spinner {
+      border: 4px solid rgba(67, 97, 238, 0.1);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .results-container {
+      margin-top: 2rem;
+    }
+
+    .phase-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .phase-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--accent);
+      display: inline-block;
+    }
+
+    .college-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .college-table th {
+      background-color: var(--primary);
+      color: white;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    .college-table td {
+      padding: 1rem;
+      border-bottom: 1px solid #f1f3f9;
+    }
+
+    .college-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .college-table tr:nth-child(even) {
+      background-color: #f9faff;
+    }
+
+    .college-table tr:hover {
+      background-color: #f1f4ff;
+    }
+
+    .footer {
+      background: linear-gradient(135deg, var(--dark), #343a40);
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    .footer-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .footer p {
+      margin-bottom: 1rem;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .social-links a {
+      color: white;
+      font-size: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .social-links a:hover {
+      color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .heart {
+      color: var(--danger);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .college-table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+
+    /* Animation classes */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Tooltip for form fields */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: var(--dark);
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.8rem;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+<header class="header" data-aos="fade-down">
+  <h1>EAMCET College Predictor</h1>
+  <p>Enter your details to discover the best colleges matching your rank and preferences</p>
+</header>
+
+<main class="main-container">
+  <section class="predictor-card" data-aos="zoom-in-up">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="rank">EAMCET Rank</label>
+        <input type="number" id="rank" placeholder="Enter your rank">
+      </div>
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select id="category">
+          <option value="">Select Category</option>
+          <option value="OC">OC</option>
+          <option value="BC_A">BC_A</option>
+          <option value="BC_B">BC_B</option>
+          <option value="BC_C">BC_C</option>
+          <option value="BC_D">BC_D</option>
+          <option value="BC_E">BC_E</option>
+          <option value="SC">SC</option>
+          <option value="ST">ST</option>
+          <option value="EWS">EWS GEN OU</option>
+          <option value="EWS">EWS GIRLS OU</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select id="gender">
+          <option value="">Select Gender</option>
+          <option value="BOYS">BOYS</option>
+          <option value="GIRLS">GIRLS</option>
+          <option value="GEN OU">EWS GEN OU</option>
+          <option value="GIRLS OU">EWS GIRLS OU</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="branch">Branch</label>
+        <select id="branch">
+          <option value="">Select Branch</option>
+          <option value="COMPUTER SCIENCE AND ENGINEERING">CSE- COMPUTER SCIENCE AND ENGINEERING</option>
+          <option value="COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)">CSM- COMPUTER SCIENCE AND ENGINEERING (ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)</option>
+          <option value="COMPUTER SCIENCE AND ENGINEERING (DATA SCIENCE)">CSD-COMPUTER SCIENCE AND ENGINEERING (DATA SCIENCE)</option>
+          <option value="COMPUTER SCIENCE AND ENGINEERING (CYBER SECURITY)">CSC-COMPUTER SCIENCE AND ENGINEERING (CYBER SECURITY)</option>
+          <option value="ELECTRONICS AND COMMUNICATION ENGINEERING">ECE</option>
+          <option value="ELECTRONICS COMMUNICATION AND INSTRUMENTATION ENGINEERING">ECI - ELECTRONICS COMMUNICATION AND INSTRUMENTATION ENGINEERING</option>
+          <option value="ELECTRONICS AND INSTRUMENTATION ENGINEERING">EIE- ELECTRONICS AND INSTRUMENTATION ENGINEERING</option>
+          <option value="ELECTRONICS AND COMPUTER ENGINEERING">ELECTRONICS AND COMPUTER ENGINEERING</option>
+          <option value="ELECTRICAL AND ELECTRONICS ENGINEERING">EEE</option>
+          <option value="MECHANICAL ENGINEERING">Mechanical</option>
+          <option value="CIVIL ENGINEERING">Civil</option>
+          <option value="ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING">AIM(ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING)</option>
+          <option value="ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING">(AID)ARTIFICIAL INTELLIGENCE AND DATA SCIENCE</option>
+          <option value="COMPUTER SCIENCE AND BUSINESS SYSTEM">COMPUTER SCIENCE AND BUSINESS SYSTEM</option>
+          <option value="INFORMATION TECHNOLOGY">IT</option>
+          <option value="CSE (IoT AND CYBER SECURITY INCLUDING BLOCK CHAIN TECHNOLOGY)">CIC (CSE-IoT AND CYBER SECURITY INCLUDING BLOCK CHAIN TECHNOLOGY)</option>
+          <option value="MINING ENGINEERING">MINING ENGINEERING(MIN)</option>
+          <option value="BIO-MEDICAL ENGINEERING">BIO-MEDICAL ENGINEERING(BME)</option>
+          <option value="PHARMACEUTICAL ENGINEERING">PHARMACEUTICAL ENGINEERING(PHE)</option>
+          <option value="AGRICULTURAL ENGINEERING">AGRICULTURAL ENGINEERING(AGR)</option>
+          <option value="BIO-TECHNOLOGY">BIO-TECHNOLOGY(BIO)</option>
+          <option value="CHEMICAL ENGINEERING">CHEMICAL ENGINEERING(CHE)</option>
+          <option value="DAIRYING">DAIRYING</option>
+          <option value="FOOD TECHNOLOGY">FOOD TECHNOLOGY(FDT)</option>
+          <option value="COMPUTER SCIENCE & DESIGN">(CSG)COMPUTER SCIENCE & DESIGN</option>
+          <option value="COMPUTER SCIENCE AND ENGINEERING (IOT)">CSO-COMPUTER SCIENCE AND ENGINEERING (IOT)</option>
+          <option value="BUILDING SERVICES ENGG">BUILDING SERVICES ENGG(BSE)</option>
+          <option value="DIGITAL TECHNIQUES FOR DESIGN AND PLANNING">DTD-DIGITAL TECHNIQUES FOR DESIGN AND PLANNING</option>
+          <option value="B.PLANNING">PLG- B.PLANNING</option>
+          <option value="GEO INFORMATICS">GEO- GEO INFORMATICS</option>
+          <option value="METALLURGICAL ENGINEERING">METALLURGICAL ENGINEERING</option>
+          <option value="BTECH MECHANICAL WITH MTECH MANUFACTURING SYSTEMS">MMS- BTECH MECHANICAL WITH MTECH MANUFACTURING SYSTEMS</option>
+          <option value="BTECH MECHANICAL WITH MTECH THERMAL ENGG">BTECH MECHANICAL WITH MTECH THERMAL ENGG</option>
+          <option value="TEXTILE TECHNOLOGY / TEXTILE ENGINEERING">TEX-TEXTILE TECHNOLOGY / TEXTILE ENGINEERING</option>
+          <option value="AERONAUTICAL ENGINEERING">AERONAUTICAL ENGINEERING</option>
+        </select>
+      </div>
+    </div>
+    <button id="submitButton" class="btn">Predict Colleges</button>
+  </section>
+
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Analyzing data and finding best matches...</p>
+  </div>
+
+  <section id="results" class="results-container"></section>
+</main>
+
+<footer class="footer" data-aos="fade-up">
+  <div class="footer-content">
+    <p>
+      CRAFTED WITH <i class="fas fa-heart heart"></i> BY <a href="https://www.instagram.com/prashanth_bathini_/" style="color: var(--accent); text-decoration: none;">Prashanth Bathini</a>
+    </p>
+    <div class="social-links">
+      <a href="https://www.instagram.com/prashanth_bathini_/" target="_blank" aria-label="Instagram">
+        <i class="fab fa-instagram"></i>
+      </a>
+      <a href="https://www.linkedin.com/in/prashanth-bathini-1b12a0292/" target="_blank" aria-label="LinkedIn">
+        <i class="fab fa-linkedin"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('submitButton').addEventListener('click', async function () {
+    const rank = document.getElementById('rank').value;
+    const category = document.getElementById('category').value;
+    const gender = document.getElementById('gender').value;
+    const branchName = document.getElementById('branch').value;
+
+    if (!rank || !category || !gender || !branchName) {
+      alert('Please fill all the fields');
+      return;
+    }
+
+    const categoryGender = `${category} \n${gender}`;
+    document.querySelector('.loading').style.display = 'block';
+    document.getElementById('results').innerHTML = '';
+
+    try {
+      const response = await fetch('http://localhost:3000/api/predict-colleges', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rank, categoryGender, branchName })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const resultBox = document.getElementById('results');
+        const phases = Object.keys(data);
+
+        if (phases.length === 0) {
+          resultBox.innerHTML = '<div class="phase-section"><p class="no-results">No colleges found matching your criteria. Try adjusting your rank or preferences.</p></div>';
+        } else {
+          phases.forEach(phase => {
+            const list = data[phase];
+            const phaseSection = document.createElement('div');
+            phaseSection.className = 'phase-section fade-in';
+            
+            const title = document.createElement('h2');
+            title.className = 'phase-title';
+            title.textContent = phase;
+            phaseSection.appendChild(title);
+
+            const table = document.createElement('table');
+            table.className = 'college-table';
+            
+            // Create table header
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+              <tr>
+                <th>Property</th>
+                <th>Details</th>
+              </tr>
+            `;
+            table.appendChild(thead);
+            
+            // Create table body
+            const tbody = document.createElement('tbody');
+            
+            list.forEach(college => {
+              // Create row for Institute Name
+              const row1 = document.createElement('tr');
+              row1.innerHTML = `
+                <td><strong>Institute Name</strong></td>
+                <td>${college['Institute Name']}</td>
+              `;
+              tbody.appendChild(row1);
+              
+              // Create row for Branch
+              const row2 = document.createElement('tr');
+              row2.innerHTML = `
+                <td><strong>Branch</strong></td>
+                <td>${college['Branch Name']}</td>
+              `;
+              tbody.appendChild(row2);
+              
+              // Create row for Location
+              const row3 = document.createElement('tr');
+              row3.innerHTML = `
+                <td><strong>Location</strong></td>
+                <td>${college.Place}</td>
+              `;
+              tbody.appendChild(row3);
+              
+              // Create row for Fee
+              const row4 = document.createElement('tr');
+              row4.innerHTML = `
+                <td><strong>Tuition Fee</strong></td>
+                <td>${college['Tuition Fee']}</td>
+              `;
+              tbody.appendChild(row4);
+              
+              // Create row for Closing Rank
+              const row5 = document.createElement('tr');
+              row5.innerHTML = `
+                <td><strong>Closing Rank</strong></td>
+                <td>${college[categoryGender] || 'N/A'}</td>
+              `;
+              tbody.appendChild(row5);
+              
+              // Add spacing between colleges
+              const spacerRow = document.createElement('tr');
+              spacerRow.innerHTML = '<td colspan="2" style="height: 20px; background: transparent;"></td>';
+              tbody.appendChild(spacerRow);
+            });
+            
+            table.appendChild(tbody);
+            phaseSection.appendChild(table);
+            resultBox.appendChild(phaseSection);
+          });
+        }
+      } else {
+        document.getElementById('results').innerHTML = `<div class="error-message"><p>Error: ${data.error || 'Something went wrong. Please try again.'}</p></div>`;
+      }
+
+    } catch (error) {
+      document.getElementById('results').innerHTML = `<div class="error-message"><p>Error: ${error.message || 'Failed to fetch data. Please check your connection.'}</p></div>`;
+    } finally {
+      document.querySelector('.loading').style.display = 'none';
+    }
+  });
+</script>
+
+<!-- AOS Library JS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 800, once: true });
+</script>
+
+</body>
+</html>
