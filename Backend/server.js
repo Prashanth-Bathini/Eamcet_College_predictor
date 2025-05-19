@@ -19,7 +19,9 @@ function calculateRankRange(rank) {
   if (rank < 50000) return [rank - 5000, rank + 5000];
   return [rank - 10000, rank + 10000];
 }
-
+app.get('/',async(req,res)=>{
+        res.send("API WORKING");
+});
 app.post('/api/predict-colleges', async (req, res) => {
   try {
     const { rank, categoryGender, branchName } = req.body;
